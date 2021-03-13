@@ -5,7 +5,7 @@
 #include "param.h"
 
 int main(int argc, char** argv){
-/*
+
 	int i;
 
 	struct pstat procs;
@@ -18,6 +18,6 @@ int main(int argc, char** argv){
 			printf(0, "ps(%d):	%d	%d	%d	%d\n", i, procs.inuse[i], procs.tickets[i], procs.pid[i], procs.ticks[i]);
 		}
 	}
-*/	
+	
 	exit();
 }

@@ -8,6 +8,7 @@
 #include "proc.h"
 //For lock
 #include "spinlock.h"
+#include "pstat.h"
 
 int
 sys_fork(void)
@@ -111,5 +112,37 @@ int sys_settickets(void)
 	release(&ptable.lock);
 
 	return numtickets;
+}
+
+int sys_getpinfo(void)
+{
+
+	struct pstat *procs;
+	
+	if (argptr(0, (void*)&procs, sizeof(*procs))<0) return -1;
+
+	acquire(&ptable.lock);
+
+//	struct proc *p;
+	int p;
+	for (p = 0; p < NPROC; p++)
+	{
+
+		if (ptable.proc[p].state == UNUSED) 
+		{
+			procs->inuse[p] = 0;
+		}
+		else
+		{
+			procs->inuse[p] = 1;
+		}
+		
+		procs->tickets[p]=ptable.proc[p].tickets;
+		procs->pid[p]=ptable.proc[p].pid;
+//		procs->ticks[p]=ptable.proc[p].ticks;
+	}	
+
+	release(&ptable.lock);	
+	return 0;
 }
 
