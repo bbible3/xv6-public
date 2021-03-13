@@ -6,6 +6,8 @@
 #include "memlayout.h"
 #include "mmu.h"
 #include "proc.h"
+//For lock
+#include "spinlock.h"
 
 int
 sys_fork(void)
@@ -89,3 +91,25 @@ sys_uptime(void)
   release(&tickslock);
   return xticks;
 }
+
+//To get lock working
+struct ptable_struct{
+	struct spinlock lock;
+	struct proc proc[NPROC];
+};
+extern struct ptable_struct ptable;
+
+
+int sys_settickets(void)
+{
+	int numtickets;
+	argint(0,&numtickets);
+	if (numtickets<=0) return -1; //Fail if tickets error
+
+	acquire(&ptable.lock);
+	myproc()->tickets = numtickets;
+	release(&ptable.lock);
+
+	return numtickets;
+}
+
