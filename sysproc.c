@@ -139,7 +139,7 @@ int sys_getpinfo(void)
 		
 		procs->tickets[p]=ptable.proc[p].tickets;
 		procs->pid[p]=ptable.proc[p].pid;
-//		procs->ticks[p]=ptable.proc[p].ticks;
+		procs->ticks[p]=ptable.proc[p].ticks;
 	}	
 
 	release(&ptable.lock);	

@@ -89,6 +89,7 @@ found:
   p->state = EMBRYO;
   p->pid = nextpid++;
 	p->tickets = 1;
+	p->ticks = 0;
   release(&ptable.lock);
 
   // Allocate kernel stack.
@@ -198,6 +199,7 @@ fork(void)
   }
   np->sz = curproc->sz;
   np->parent = curproc;
+	np->tickets = curproc->tickets; //Inherit tickets
   *np->tf = *curproc->tf;
 
   // Clear %eax so that fork returns 0 in the child.
@@ -342,7 +344,7 @@ scheduler(void)
       c->proc = p;
       switchuvm(p);
       p->state = RUNNING;
-
+	p->ticks = p->ticks + 1; //Track ticks
       swtch(&(c->scheduler), p->context);
       switchkvm();
 
