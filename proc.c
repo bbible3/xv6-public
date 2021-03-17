@@ -6,6 +6,7 @@
 #include "x86.h"
 #include "proc.h"
 #include "spinlock.h"
+#include "grand.h"
 
 struct {
   struct spinlock lock;
@@ -334,8 +335,23 @@ scheduler(void)
 
     // Loop over process table looking for process to run.
     acquire(&ptable.lock);
+
+	int runnable_tickets = 0;
+	//Get total number of tickets of runnable processes
+	for (p = ptable.proc; p < &ptable.proc[NPROC]; p++)
+	{
+		if (p->state != RUNNABLE) continue;
+		runnable_tickets += p->tickets;
+	}
+
+	int winner = rand_range(0, runnable_tickets);
+	int viewed_tickets = 0;
+
     for(p = ptable.proc; p < &ptable.proc[NPROC]; p++){
       if(p->state != RUNNABLE)
+        continue;
+      viewed_tickets += p->tickets;
+      if (viewed_tickets < winner)
         continue;
 
       // Switch to chosen process.  It is the process's job
@@ -351,6 +367,7 @@ scheduler(void)
       // Process is done running for now.
       // It should have changed its p->state before coming back.
       c->proc = 0;
+	break; //To insure tickets work as expected
     }
     release(&ptable.lock);
 
